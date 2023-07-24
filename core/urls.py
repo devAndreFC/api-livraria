@@ -1,10 +1,18 @@
-from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
-from .views import CategoriesView
+from rest_framework import routers
 
+from core.views.categories import CategoryViewSet
+from core.views.publishers import PublisherViewSet
+from core.views.authors import AuthorViewSet
+from core.views.books import BookViewSet
+
+router = routers.DefaultRouter()
+router.register(r'categorias', CategoryViewSet)
+router.register(r'editoras', PublisherViewSet)
+router.register(r'autores', AuthorViewSet)
+router.register(r'livros', BookViewSet)
 
 urlpatterns = [
-    path('categorias/', CategoriesView.as_view(), name='categorias'),
-    path('categorias/<int:id>/', CategoriesView.as_view(), name='categoria'),
+    path('', include(router.urls))
 ]

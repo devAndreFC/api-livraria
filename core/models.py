@@ -27,7 +27,7 @@ class Publisher(models.Model):
 
 
 class Author(models.Model):
-    name = models.CharField(max_length=50)    
+    name = models.CharField(max_length=50)
 
     class Meta:
         verbose_name = 'Author'
@@ -42,9 +42,12 @@ class Book(models.Model):
     ISBN = models.CharField(max_length=50)
     quantify = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name= 'books')
-    publisher = models.ForeignKey(Publisher, on_delete=models.PROTECT, related_name='books')
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, related_name='books')
+    publisher = models.ForeignKey(
+        Publisher, on_delete=models.PROTECT, related_name='books')
     authors = models.ManyToManyField(Author, related_name='Books')
+
     class Meta:
         verbose_name = 'Book'
         verbose_name_plural = 'Books'
@@ -57,11 +60,13 @@ class Purchase(models.Model):
     class StatusPurchase(models.IntegerChoices):
         CART = 1, 'Cart'
         ORDER = 2, 'Order'
-        PAID  = 3, 'Paid'
+        PAID = 3, 'Paid'
         DELIVERED = 4, 'Delivered'
-    
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='Purchases')
-    status = models.IntegerField(choices=StatusPurchase.choices, default=StatusPurchase.CART)
+
+    user = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name='Purchases')
+    status = models.IntegerField(
+        choices=StatusPurchase.choices, default=StatusPurchase.CART)
 
     class Meta:
         verbose_name = 'Purchase'
@@ -72,7 +77,8 @@ class Purchase(models.Model):
 
 
 class ItemsPurchase(models.Model):
-    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name='Items')
+    purchase = models.ForeignKey(
+        Purchase, on_delete=models.CASCADE, related_name='Items')
     book = models.ForeignKey(Book, on_delete=models.PROTECT, related_name='+')
     quantify = models.IntegerField()
 
