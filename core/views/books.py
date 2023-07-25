@@ -6,7 +6,7 @@ from core.serializers import BookSerializer, BookDetailSerializer
 
 class BookViewSet(ModelViewSet):
     queryset = Book.objects.all()
-    # serializer_class = BookSerializer
+    serializer_class = BookSerializer
 
     def get_serializer_class(self):
         if self.action == 'list':

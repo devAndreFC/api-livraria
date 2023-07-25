@@ -1,5 +1,6 @@
-from rest_framework.serializers import ModelSerializer, CharField, SerializerMethodField
-from .models import Category, Publisher, Author, Book
+from rest_framework.serializers import (
+    ModelSerializer, CharField, SerializerMethodField)
+from .models import Category, Publisher, Author, Book, Purchase, ItemsPurchase
 
 
 class CategorySerializer(ModelSerializer):
@@ -42,3 +43,28 @@ class BookDetailSerializer(ModelSerializer):
         for author in authors:
             name_authors.append(author.name)
         return name_authors
+
+
+class ItemsPurchaseSerializer(ModelSerializer):
+    total = SerializerMethodField()
+
+    class Meta:
+        model = ItemsPurchase
+        fields = ('book', 'quantify', 'total')
+        depth = 1
+
+    def get_total(self, instance):
+        return instance.quantify * instance.book.price
+
+
+class PurchaseSerializer(ModelSerializer):
+    user = CharField(source='user.first_name')
+    status = SerializerMethodField()
+    Items = ItemsPurchaseSerializer(many=True)
+
+    class Meta:
+        model = Purchase
+        fields = ('id', 'status', 'user', 'Items', 'total')
+
+    def get_status(self, instace):
+        return instace.get_status_display()

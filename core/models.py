@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
 
 
@@ -74,6 +75,15 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f'Purchse of {self.user}'
+
+    @property
+    def total(self):
+        queryset = self.Items.all().aggregate(
+            total=models.Sum(
+                F('quantify')*F('book__price')
+            )
+        )
+        return queryset['total']
 
 
 class ItemsPurchase(models.Model):
