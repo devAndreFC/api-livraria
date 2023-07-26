@@ -68,3 +68,34 @@ class PurchaseSerializer(ModelSerializer):
 
     def get_status(self, instace):
         return instace.get_status_display()
+
+
+class CreateEditItemsPurchaseSerializer(ModelSerializer):
+    class Meta:
+        model = ItemsPurchase
+        fields = ('book', 'quantify')
+
+
+class CreateEditPurchase(ModelSerializer):
+    Items = CreateEditItemsPurchaseSerializer(many=True)
+
+    class Meta:
+        model = Purchase
+        fields = ('user', 'Items')
+
+    def create(self, validated_data):
+        items = validated_data.pop('Items')
+        new_purchase = Purchase.objects.create(**validated_data)
+        for item in items:
+            ItemsPurchase.objects.create(purchase=new_purchase, **item)
+        new_purchase.save()
+        return new_purchase
+
+    def update(self, instance, validated_data):
+        items = validated_data.pop('Items')
+        if items:
+            instance.Items.all().delete()
+            for item in items:
+                ItemsPurchase.objects.create(purchase=instance, **item)
+            instance.save()
+        return instance
