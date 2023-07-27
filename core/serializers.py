@@ -1,5 +1,6 @@
 from rest_framework.serializers import (
-    ModelSerializer, CharField, SerializerMethodField)
+    ModelSerializer, CharField, SerializerMethodField, HiddenField)
+from rest_framework import serializers
 from .models import Category, Publisher, Author, Book, Purchase, ItemsPurchase
 
 
@@ -58,7 +59,7 @@ class ItemsPurchaseSerializer(ModelSerializer):
 
 
 class PurchaseSerializer(ModelSerializer):
-    user = CharField(source='user.first_name')
+    user = CharField(source='user.email')
     status = SerializerMethodField()
     Items = ItemsPurchaseSerializer(many=True)
 
@@ -78,6 +79,7 @@ class CreateEditItemsPurchaseSerializer(ModelSerializer):
 
 class CreateEditPurchase(ModelSerializer):
     Items = CreateEditItemsPurchaseSerializer(many=True)
+    user = HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Purchase

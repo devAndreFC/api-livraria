@@ -12,3 +12,10 @@ class PurchaseViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'retrieve':
             return PurchaseSerializer
         return CreateEditPurchase
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.groups.filter(name='Administradores'):
+            return Purchase.objects.all()
+
+        return Purchase.objects.filter(user=user)
