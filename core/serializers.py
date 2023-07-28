@@ -76,6 +76,13 @@ class CreateEditItemsPurchaseSerializer(ModelSerializer):
         model = ItemsPurchase
         fields = ('book', 'quantify')
 
+    def validate(self, data):
+        if data['quantify'] > data['book'].quantify:
+            raise serializers.ValidationError({
+                'quantify': f'Quantidade solicitada: {data["quantify"]} não disponível. Em estoque: {data["book"].quantify}.'
+            })
+        return data
+
 
 class CreateEditPurchase(ModelSerializer):
     Items = CreateEditItemsPurchaseSerializer(many=True)
@@ -88,8 +95,15 @@ class CreateEditPurchase(ModelSerializer):
     def create(self, validated_data):
         items = validated_data.pop('Items')
         new_purchase = Purchase.objects.create(**validated_data)
+
         for item in items:
+            book = item['book']
+            quantity = item['quantify']
+            book.quantify -= quantity
+
+            book.save()
             ItemsPurchase.objects.create(purchase=new_purchase, **item)
+
         new_purchase.save()
         return new_purchase
 
